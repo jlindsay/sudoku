@@ -8,9 +8,10 @@ module.exports = function(grunt) {
 
     clean: {
       dist: [
-      'dist/js',
-      'dist/*.html'
-      ]
+          'dist/js',
+          'dist/*.html'
+      ], 
+      archives : ['archives/*.zip']
     },
 
     connect: {
@@ -70,30 +71,46 @@ module.exports = function(grunt) {
       }
     },
 
-  });
 
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-connect');
-  grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-contrib-less');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('jslint');
-  grunt.loadNpmTasks('matchdep');
+    compress: {
+        main: {
+            options: {
+            archive: 'archivhes/archive.zip'
+        },
+        files: [
+            {src: ['dist/**'], dest: 'archives/'}, 
+            ]
+        }
+    }
 
-  grunt.registerTask('default', 'Build and render all LESS for development.', [
-      'clean:dist',
-      'less:debug',
-      'copy:dist',
-      'connect:server',
-      'watch:all'
-  ]);
+    });
 
-  grunt.registerTask('build', 'Build and render all LESS', [
-      'clean:dist',
-      'less:debug',
-      'copy:dist'
-  ]);
+  
+    grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-connect');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-less');
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-compress');
+    grunt.loadNpmTasks('jslint');
+    grunt.loadNpmTasks('matchdep');
 
+    grunt.registerTask('dev', 'Build and render all LESS for development.', [
+        'default',
+        'connect:server',
+        'watch:all'
+    ]);
+
+    grunt.registerTask('default', 'Build and render all LESS', [
+        'clean:dist',
+        'clean:archives',
+        'less:debug',
+        'copy:dist',
+    ]);
+
+
+    grunt.registerTask('release', 'Build and render all LESS', [
+        'default',
+        'compress'
+    ]);   
 };
