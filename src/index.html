@@ -1,1 +1,49 @@
-Hello Uber!
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+    <title>Sudoku Example</title>
+    <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="icon" href="./favicon.ico">
+        <link href="./css/main.css" rel="stylesheet" type="text/css">
+        <!--link href="./css/responsive.css" rel="stylesheet" type="text/css"-->
+        
+        <link href="./bower/responsive/responsive.css" rel="stylesheet" type="text/css">
+        <script src="./bower/mondernizer/modernizr.js"></script>
+</head>
+<body>
+
+<script>
+    
+    require.config({
+        baseUrl: './',
+        urlArgs: String("r="+ (new Date()).getTime()),
+        paths: {
+            'app': 'js/main.app',
+        },
+        shim: {
+            'url': ['jquery'],
+            'cookies': ['jquery'],
+        }
+
+    });
+
+    require(['jquery','cookies', 'url', 'keynote'], function($) {
+        //initKeyBoard();
+        console.log("deubg:init()");
+        var _keynote = new Keynote().init( {pages: _pages } );
+
+        $("body").fadeIn("fast",function(e){
+            //
+        });
+    });
+
+</script>
+
+</body>
+</html>

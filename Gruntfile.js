@@ -6,84 +6,82 @@ module.exports = function(grunt) {
   grunt.config.init({
     pkg: grunt.file.readJSON('package.json'),
 
-    clean: {
-      dist: [
-          'dist/js',
-          'dist/*.html'
-      ], 
-      archives : ['archives/*.zip']
-    },
-
-    connect: {
-      server: {
-        options: {
-          port: 3030,
-          base: './dist'
-        }
-      }
-    },
-
-    less: {
-      debug: {
-        options: {
-          paths: ['src/less'],
-          'dumpLineNumbers': 'all'
+        clean: {
+            dist: [
+                'dist/js',
+                'dist/*.html' ], 
+            archives : ['archives/*.zip']
         },
-        files: [{
-          expand: true,
-          cwd: 'src/less/',
-          src: ['main.less'],
-          dest: './dist/css/',
-          ext: '.css',
-          nonull: true
-        }]
-      }
-    },
 
-    watch: {
-      options: {
-        livereload: true,
-      },
-      all: {
-        files: ['src/js/**/*.js', 'src/**/*.html', 'src/less/**/*.less'],
-        tasks: [
-          'less:debug',
-          'copy:dist'],
-        options: {
-          interrupt: true
-        }
-      }
-    },
+        connect: {
+            server: {
+                options: {
+                    port: 3030,
+                    base: './dist'
+                }
+            }
+        },
 
+        less: {
+            debug: {
+                options: {
+                    paths: ['src/less'],
+                    'dumpLineNumbers': 'all'
+                },
+                files: [{
+                    expand: true,
+                    cwd: 'src/less/',
+                    src: ['main.less'],
+                    dest: './dist/css/',
+                    ext: '.css',
+                    nonull: true
+                }]
+            }
+        },
 
-    copy: {
-      dist: {
-        files: [{
-          expand: true,
-          cwd: './src/',
-          src: [
-            'js/**/*.js', 
-            '*.html', 
-            'tmpl/**/*.html'
-          ],
-          dest: 'dist/'
-        }]
-      }
-    },
-
-
-    compress: {
-        main: {
+        watch: {
             options: {
-            archive: 'archivhes/archive.zip'
+                livereload: true,
+            },
+            all: {
+                files: ['src/js/**/*.js', 'src/**/*.html', 'src/less/**/*.less'],
+                tasks: [
+                    'less:debug',
+                    'copy:dist'],
+                options: {
+                    interrupt: true
+                }
+            }
         },
-        files: [
-            {src: ['dist/**'], dest: 'archives/'}, 
-            ]
-        }
-    }
 
-    });
+
+        copy: {
+            dist: {
+                files: [{
+                    expand: true,
+                    cwd: './src/',
+                    src: [
+                        'js/**/*.js', 
+                        '*.html', 
+                        'tmpl/**/*.html'
+                    ],
+                    dest: 'dist/'
+                }]
+            }
+        },
+
+
+        compress: {
+            main: {
+                options: {
+                archive: 'archives/archive.zip'
+            },
+            files: [
+                { src: ['dist/**'], dest: 'archives/'} ]
+            }
+        }
+
+});
 
   
     grunt.loadNpmTasks('grunt-contrib-clean');
@@ -103,14 +101,13 @@ module.exports = function(grunt) {
 
     grunt.registerTask('default', 'Build and render all LESS', [
         'clean:dist',
-        'clean:archives',
         'less:debug',
         'copy:dist',
     ]);
 
-
-    grunt.registerTask('release', 'Build and render all LESS', [
+    grunt.registerTask('archive', 'Build and render all LESS', [
         'default',
+        'clean:archives',
         'compress'
     ]);   
 };
