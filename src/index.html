@@ -46,6 +46,7 @@
         background-color:#555;
         width:30px;
         height:30px;
+        line-height: 28px;
         border: 1px solid #666;   
         margin:1px;   
     }
@@ -55,6 +56,21 @@
         background-color:#777;
     }
 
+    .game-board .box input[type='text']
+    {
+          font-family: Segoe UI, Arial;
+          font-size: 30px;
+          color: #FFFFFF;
+          width: 30px;
+          height: 30px;
+          padding: 0px;
+          border: 0px;
+          background: none !important;
+          text-align: center;
+          vertical-align: middle;
+          position: relative;
+          left: -1px;
+    }
     .game-board .odd
     {
         background-color: #666;
@@ -71,9 +87,9 @@
 
 <p>
 <h1>Rules</h1>
-    1. Number can appear only once on each row:
-    2. Number can appear only once on each column:
-    3. Number can appear only once on each region:
+    <div>1. Number can appear only once on each row:</div>
+    <div>2. Number can appear only once on each column:</div>
+    <div>3. Number can appear only once on each region:</div>
 </p>
 
 
@@ -96,7 +112,18 @@
     function renderGameBoard(elm)
     {
         console.log("renderGameBoard()elm:", elm );
-        var box_html  = "<div data-id='{{id}}' data-col='{{col}}' data-row={{row}} data-quad-col='{{quad_col}}' data-quad-id='{{quad_id}}' class='box {{is_odd}}'></div>";
+        var box_html  = "\
+            <div class='box {{is_odd}}'>\
+                 <form>\
+                     <input type='hidden' name='id' value='{{id}}' /> \
+                     <input type='hidden' name='col' value='{{col}}' /> \
+                     <input type='hidden' name='row' value='{{row}}' /> \
+                     <input type='hidden' name='quad-col' value={{quad_col}}' /> \
+                     <input type='hidden' name='quad-id' value={{quad_id}}' /> \
+                 </form>\
+                 <input type='text' name='edit' value='' maxlength='1' onkeypress='return event.charCode >= 48 && event.charCode <= 57' /> \
+            </div>";
+
         var html = "";
         var row = 0;
         var col = 0;
@@ -108,7 +135,7 @@
 
         for(var i=0; i<81; i++)
         {
-            var str = box_html;
+            var tmpl = box_html;
 
             if( col >= 9 ){
                 col = 0;
@@ -126,18 +153,16 @@
                  quad_id == 6 || 
                  quad_id == 8 )
             {
-                str = str.split("{{is_odd}}").join("odd");
+                tmpl = tmpl.split("{{is_odd}}").join("odd");
             }else{
-                str = str.split("{{is_odd}}").join("");
+                tmpl = tmpl.split("{{is_odd}}").join("");
             }
             
-            str = str.split("{{id}}").join(i);
-            str = str.split("{{row}}").join(row);
-            str = str.split("{{col}}").join(col);
-            str = str.split("{{quad_col}}").join(quad_col);
-            str = str.split("{{quad_id}}").join(quad_id);
-
-//            console.log("id:", i, ", row:", row, ", col:", col, ", quad_col:", quad_col ,  ", quad_id:", quad_id);
+            tmpl = tmpl.split("{{id}}").join(i);
+            tmpl = tmpl.split("{{row}}").join(row);
+            tmpl = tmpl.split("{{col}}").join(col);
+            tmpl = tmpl.split("{{quad_col}}").join(quad_col);
+            tmpl = tmpl.split("{{quad_id}}").join(quad_id);
 
             if( quad == 2 && col == 8 && offset == 26 )
             {
@@ -146,12 +171,38 @@
             }
 
             col++;
-            html += str;
+            html += tmpl;
         }
-        
         $(elm).empty();
         $(elm).html(html);
+        $(elm).find(".box input[type='text']").click(clickHandler);
+        $(elm).find(".box input[type='text']").on("change", inputHandler );
+        //initUI(elm);
+    }
 
+    function inputHandler(e)
+    {
+        e.preventDefault();
+        var elm      = $(e.target).closest(".box");
+        var id       = elm.find("input[name='id']").val();
+        var col      = elm.find("input[name='col']").val();
+        var row      = elm.find("input[name='row']").val();
+        var quad_col = elm.find("input[name='quad-col']").val();
+        var quad_id  = elm.find("input[name='quad-id']").val();
+        console.log("inputHandler():id:", id );
+
+    }
+
+    function clickHandler(e)
+    {   
+        e.preventDefault();
+        var elm      = $(e.target).closest(".box");
+        var id       = elm.find("input[name='id']").val();
+        var col      = elm.find("input[name='col']").val();
+        var row      = elm.find("input[name='row']").val();
+        var quad_col = elm.find("input[name='quad-col']").val();
+        var quad_id  = elm.find("input[name='quad-id']").val();
+        //console.log("clickHandler():id:", id );
     }
 
     function move( row, col )
