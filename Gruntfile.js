@@ -36,6 +36,22 @@ module.exports = function(grunt) {
                     dest: './dist/css/',
                     ext: '.css',
                     nonull: true
+                },
+                {
+                    expand: true,
+                    cwd: 'src/less/',
+                    src: ['demo.less'],
+                    dest: './dist/css/',
+                    ext: '.css',
+                    nonull: true
+                },
+                {
+                    expand: true,
+                    cwd: 'src/less/',
+                    src: ['sudoku.less'],
+                    dest: './dist/css/',
+                    ext: '.css',
+                    nonull: true
                 }]
             }
         },
