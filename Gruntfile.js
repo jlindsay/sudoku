@@ -17,7 +17,8 @@ module.exports = function(grunt) {
             server: {
                 options: {
                     port: 3030,
-                    base: './dist'
+                    base: './dist',
+                    c:"-1"
                 }
             }
         },
@@ -44,7 +45,7 @@ module.exports = function(grunt) {
                 livereload: true,
             },
             all: {
-                files: ['src/js/**/*.js', 'src/**/*.html', 'src/less/**/*.less'],
+                files: ['src/js/**/*.js', 'src/index.html','src/**/*.html', 'src/less/**/*.less'],
                 tasks: [
                     'less:debug',
                     'copy:dist'],
@@ -90,9 +91,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-compress');
-    grunt.loadNpmTasks('jslint');
-    grunt.loadNpmTasks('matchdep');
-
+    
     grunt.registerTask('dev', 'Build and render all LESS for development.', [
         'default',
         'connect:server',

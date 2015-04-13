@@ -13,37 +13,175 @@
         <link href="./css/main.css" rel="stylesheet" type="text/css">
         <!--link href="./css/responsive.css" rel="stylesheet" type="text/css"-->
         
-        <link href="./bower/responsive/responsive.css" rel="stylesheet" type="text/css">
-        <script src="./bower/mondernizer/modernizr.js"></script>
+        <link href="./bower/responsive/build/responsive.css" rel="stylesheet" type="text/css">
+        <script src="./bower/modernizer/modernizr.js"></script>
 </head>
 <body>
 
-<script>
+
+<style>
     
-    require.config({
-        baseUrl: './',
-        urlArgs: String("r="+ (new Date()).getTime()),
-        paths: {
-            'app': 'js/main.app',
-        },
-        shim: {
-            'url': ['jquery'],
-            'cookies': ['jquery'],
+    html body
+    {   
+        margin:0px;
+        padding:0px;
+    }
+
+    .game-board
+    {
+        display:inline-block;
+        background-color:#fff;
+        height:auto;
+        width:auto;
+        border:4px solid #000;
+        max-width: 296px;
+        background-color:#333;
+    }
+
+    .game-board .box
+    {
+        position: relative;
+        float: left;
+        
+        background-color:#555;
+        width:30px;
+        height:30px;
+        border: 1px solid #666;   
+        margin:1px;   
+    }
+
+    .game-board .box:hover
+    {
+        background-color:#777;
+    }
+
+    .game-board .odd
+    {
+        background-color: #666;
+    }
+
+    .game-board .odd:hover
+    {
+        background-color: #888;   
+    }
+
+</style>
+
+<div class="game-board"></div>
+
+<p>
+<h1>Rules</h1>
+    1. Number can appear only once on each row:
+    2. Number can appear only once on each column:
+    3. Number can appear only once on each region:
+</p>
+
+
+
+<script src="./bower/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript">
+
+    $(document).ready(function(e){
+        init(".game-board");
+    });
+
+
+    function init(elm)
+    {
+        console.log("init()");
+
+        renderGameBoard( elm );
+    }
+
+    function renderGameBoard(elm)
+    {
+        console.log("renderGameBoard()elm:", elm );
+        var box_html  = "<div data-id='{{id}}' data-col='{{col}}' data-row={{row}} data-quad-col='{{quad_col}}' data-quad-id='{{quad_id}}' class='box {{is_odd}}'></div>";
+        var html = "";
+        var row = 0;
+        var col = 0;
+        var quad_col = 0;
+        var base_quad = 0;
+        var quad_id = 0;
+        var quad = 0;
+        var offset = 0;
+
+        for(var i=0; i<81; i++)
+        {
+            var str = box_html;
+
+            if( col >= 9 ){
+                col = 0;
+                row++;
+            }
+
+                quad_col = col % 3;
+                quad = Math.floor( col / 3 );
+                offset = i%27;
+
+                quad_id = base_quad + quad;
+            if( quad_id == 0 || 
+                 quad_id == 2 || 
+                 quad_id == 4 || 
+                 quad_id == 6 || 
+                 quad_id == 8 )
+            {
+                str = str.split("{{is_odd}}").join("odd");
+            }else{
+                str = str.split("{{is_odd}}").join("");
+            }
+            
+            str = str.split("{{id}}").join(i);
+            str = str.split("{{row}}").join(row);
+            str = str.split("{{col}}").join(col);
+            str = str.split("{{quad_col}}").join(quad_col);
+            str = str.split("{{quad_id}}").join(quad_id);
+
+//            console.log("id:", i, ", row:", row, ", col:", col, ", quad_col:", quad_col ,  ", quad_id:", quad_id);
+
+            if( quad == 2 && col == 8 && offset == 26 )
+            {
+                //3 quadrants per row
+                base_quad+=3;
+            }
+
+            col++;
+            html += str;
         }
+        
+        $(elm).empty();
+        $(elm).html(html);
 
-    });
+    }
 
-    require(['jquery','cookies', 'url', 'keynote'], function($) {
-        //initKeyBoard();
-        console.log("deubg:init()");
-        var _keynote = new Keynote().init( {pages: _pages } );
+    function move( row, col )
+    {
+        //
+    }
 
-        $("body").fadeIn("fast",function(e){
-            //
-        });
-    });
+    function isWinner( row,col, quad )
+    {
+        return  calcQuad(quad) && calcRow(row) && calcCol(col) ;
+    }
+
+
+    function calRow(id)
+    {
+        return true;
+    }
+
+    function calCol(id)
+    {
+        return true;
+    }
+
+    function calcQuad(id)
+    {
+        return true;
+    }
 
 </script>
+
 
 </body>
 </html>
