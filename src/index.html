@@ -116,12 +116,12 @@
             <div class='box {{is_odd}}'>\
                  <form>\
                      <input type='hidden' name='id' value='{{id}}' /> \
-                     <input type='hidden' name='col' value='{{col}}' /> \
-                     <input type='hidden' name='row' value='{{row}}' /> \
+                     <input type='hidden' name='col_id' value='{{col_id}}' /> \
+                     <input type='hidden' name='row_id' value='{{row_id}}' /> \
                      <input type='hidden' name='quad-col' value={{quad_col}}' /> \
                      <input type='hidden' name='quad-id' value={{quad_id}}' /> \
                  </form>\
-                 <input type='text' name='edit' value='' maxlength='1' onkeypress='return event.charCode >= 48 && event.charCode <= 57' /> \
+                 <input type='text' name='edit-input' value='' maxlength='1' onkeypress='return event.charCode >= 48 && event.charCode <= 57' /> \
             </div>";
 
         var html = "";
@@ -159,8 +159,8 @@
             }
             
             tmpl = tmpl.split("{{id}}").join(i);
-            tmpl = tmpl.split("{{row}}").join(row);
-            tmpl = tmpl.split("{{col}}").join(col);
+            tmpl = tmpl.split("{{row_id}}").join(row);
+            tmpl = tmpl.split("{{col_id}}").join(col);
             tmpl = tmpl.split("{{quad_col}}").join(quad_col);
             tmpl = tmpl.split("{{quad_id}}").join(quad_id);
 
@@ -185,12 +185,14 @@
         e.preventDefault();
         var elm      = $(e.target).closest(".box");
         var id       = elm.find("input[name='id']").val();
-        var col      = elm.find("input[name='col']").val();
-        var row      = elm.find("input[name='row']").val();
+        var col_id   = elm.find("input[name='col_id']").val();
+        var row_id   = elm.find("input[name='row_id']").val();
         var quad_col = elm.find("input[name='quad-col']").val();
         var quad_id  = elm.find("input[name='quad-id']").val();
+        var val     = elm.find("input[name='edit-input']").val();
+            val = ( val == "" )? -1 : Number( val );
         console.log("inputHandler():id:", id );
-
+        check( val, row_id, col_id, quad_id );
     }
 
     function clickHandler(e)
@@ -198,37 +200,84 @@
         e.preventDefault();
         var elm      = $(e.target).closest(".box");
         var id       = elm.find("input[name='id']").val();
-        var col      = elm.find("input[name='col']").val();
-        var row      = elm.find("input[name='row']").val();
+        var col_id     = elm.find("input[name='col_id']").val();
+        var row_id     = elm.find("input[name='row_id']").val();
         var quad_col = elm.find("input[name='quad-col']").val();
         var quad_id  = elm.find("input[name='quad-id']").val();
+        var val     = elm.find("input[name='edit-input']").val();
+            val = ( val == "" )? -1 : Number( val );
         //console.log("clickHandler():id:", id );
     }
 
-    function move( row, col )
+    function check( val, row_id, col_id, quad_id )
     {
-        //
+        console.log( "move:", val, row_id, col_id, quad_id );
+        isRowOk = getRowById( row_id );
+        isColOk = getColById( col_id );
+        isQuadOk = getQuadBy( quad_id );
+        
+        return isRowOk && isColOk && isQuadOk;
     }
 
-    function isWinner( row,col, quad )
+
+    function getRowById( row_id)
     {
-        return  calcQuad(quad) && calcRow(row) && calcCol(col) ;
+        console.log("checkRow():row_id", row_id );
+        var elms = $(".game-board .box input[name='row_id'][value='"+ row_id +"'] ");
+        var values = [];
+        //var hasDuplicate;
+        $.each( elms, function(index, elm){
+            
+            var box = $(elm).closest(".box");
+            var val = $(box).find("input[name='edit-input']").val();
+                
+                val = ( val == "" )? -1 : Number( val );
+//                console.log("val:", val);
+                values.push( val );
+                
+        });
+//        console.log( "values:", values );
+        return values;
     }
 
-
-    function calRow(id)
+    function getColById( col_id)
     {
-        return true;
+        console.log("getColById():col_id", col_id );
+        var elms = $(".game-board .box input[name='col_id'][value='"+ col_id +"'] ");
+        var values = [];
+        //var hasDuplicate;
+        $.each( elms, function(index, elm){
+            
+            var box = $(elm).closest(".box");
+            var val = $(box).find("input[name='edit-input']").val();
+                
+                val = ( val == "" )? -1 : Number( val );
+//                console.log("val:", val);
+                values.push( val );
+                
+        });
+        console.log( "values:", values );
+        return values;
     }
 
-    function calCol(id)
+    function getQuadBy( quad_id)
     {
-        return true;
-    }
-
-    function calcQuad(id)
-    {
-        return true;
+        console.log("getQuadBy():quad_id", quad_id );
+        var elms = $(".game-board .box input[name='quad_id'][value='"+ quad_id +"'] ");
+        var values = [];
+        //var hasDuplicate;
+        $.each( elms, function(index, elm){
+            
+            var box = $(elm).closest(".box");
+            var val = $(box).find("input[name='edit-input']").val();
+                
+                val = ( val == "" )? -1 : Number( val );
+//                console.log("val:", val);
+                values.push( val );
+                
+        });
+//        console.log( "values:", values );
+        return values;
     }
 
 </script>
