@@ -215,7 +215,7 @@
         var isRowOk  = getRowById( row_id );
         var isColOk  = getColById( col_id );
         var isQuadOk;// = getQuadById( quad_id );
-        
+        console.log( "isRowOk:", isRowOk, ", isColOk:", isColOk, ", isQuadOk:", isQuadOk );
         return isRowOk && isColOk && isQuadOk;
     }
 
@@ -237,7 +237,7 @@
                 
         });
 //        console.log( "values:", values );
-        return values;
+        return ( values.sort().join("") == "012345678" );
     }
 
     function getColById( col_id)
@@ -257,7 +257,7 @@
                 
         });
         console.log( "values:", values );
-        return values;
+        return ( values.sort().join("") == "012345678" );
     }
 
     function getQuadById( quad_id)
@@ -277,7 +277,7 @@
                 
         });
 //        console.log( "values:", values );
-        return values;
+        return ( values.sort().join("") == "012345678" );
     }
 
 </script>
