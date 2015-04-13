@@ -212,9 +212,9 @@
     function check( val, row_id, col_id, quad_id )
     {
         console.log( "move:", val, row_id, col_id, quad_id );
-        isRowOk = getRowById( row_id );
-        isColOk = getColById( col_id );
-        isQuadOk = getQuadBy( quad_id );
+        var isRowOk  = getRowById( row_id );
+        var isColOk  = getColById( col_id );
+        var isQuadOk;// = getQuadById( quad_id );
         
         return isRowOk && isColOk && isQuadOk;
     }
@@ -260,10 +260,10 @@
         return values;
     }
 
-    function getQuadBy( quad_id)
+    function getQuadById( quad_id)
     {
         console.log("getQuadBy():quad_id", quad_id );
-        var elms = $(".game-board .box input[name='quad_id'][value='"+ quad_id +"'] ");
+        var elms = $(".game-board .box input[name='quad-id'][value='"+ quad_id +"'] ");
         var values = [];
         //var hasDuplicate;
         $.each( elms, function(index, elm){
