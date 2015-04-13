@@ -21,10 +21,26 @@
 
 <style>
     
-    html body
-    {   
+     
+    html body{   
         margin:0px;
         padding:0px;
+        background-color: #f2f2f2;
+        color: #333;
+        font-style: normal;
+        font-family: "Myriad Set Pro","Lucida Grande","Helvetica Neue","Helvetica","Arial","Verdana","sans-serif";
+        font-size: 18px;
+        line-height: 1.45;
+        font-weight: 400;
+    }
+
+    .content
+    {
+        padding:50px;
+        height:100%;
+        width: 100%;
+        font-weight: 300;
+        font-size: 14px;
     }
 
     .game-board
@@ -34,8 +50,10 @@
         height:auto;
         width:auto;
         border:4px solid #000;
-        max-width: 296px;
+        width: 296px;
         background-color:#333;
+        border-radius: 5px;
+        box-shadow: 0px 0px 7px rgba(0,0,0,0.7);
     }
 
     .game-board .box
@@ -49,50 +67,67 @@
         line-height: 28px;
         border: 1px solid #666;   
         margin:1px;   
+        border-radius: 1px;
+        box-shadow: inset 0px 0px 3px rgba(0,0,0,0.3);
+
+        -o-transition:.3s;
+        -ms-transition:.3s;
+        -moz-transition:.3s;
+        -webkit-transition:.3s;
+        transition:.3s;
     }
 
     .game-board .box:hover
     {
-        background-color:#777;
+        background-color:#a4e402;
     }
 
     .game-board .box input[type='text']
     {
-          font-family: Segoe UI, Arial;
-          font-size: 30px;
-          color: #FFFFFF;
-          width: 30px;
-          height: 30px;
-          padding: 0px;
-          border: 0px;
-          background: none !important;
-          text-align: center;
-          vertical-align: middle;
-          position: relative;
-          left: -1px;
+        font-family: Segoe UI, Arial;
+        font-size: 30px;
+        color: #FFFFFF;
+        width: 30px;
+        height: 30px;
+        padding: 0px;
+        border: 0px;
+        background: none !important;
+        text-align: center;
+        vertical-align: middle;
+        position: relative;
+        left: -1px;
     }
+
     .game-board .odd
     {
         background-color: #666;
+        
     }
 
     .game-board .odd:hover
     {
-        background-color: #888;   
+        background-color:#a4e402;
     }
 
 </style>
 
-<div class="game-board"></div>
+<div class="content">
 
-<p>
-<h1>Rules</h1>
-    <div>1. Number can appear only once on each row:</div>
-    <div>2. Number can appear only once on each column:</div>
-    <div>3. Number can appear only once on each region:</div>
-</p>
+    <div class="game-board"></div>
 
+    <p>
+        <h1>Sudoku</h1>
+        The Classic Sudoku is a number placing puzzle based on a 9x9 grid with several given numbers. The object is to place the numbers 1 to 9 in the empty squares so that each row, each column and each 3x3 box contains the same number only once.
+    </p>
 
+    <p>
+    <h1>Rules</h1>
+        <div>1. Number can appear only once on each row:</div>
+        <div>2. Number can appear only once on each column:</div>
+        <div>3. Number can appear only once on each region:</div>
+    </p>
+
+</div>
 
 <script src="./bower/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript">
@@ -107,12 +142,17 @@
         console.log("init()");
 
         renderGameBoard( elm );
-    }
 
-    function renderGameBoard(elm)
+    }
+    /**
+     * Rules
+     * 1. Number can appear only once on each row.
+     * 2. Number can appear only once on each column.
+     * 3. Number can appear only once on each region.
+     */
+    function boxHTML()
     {
-        console.log("renderGameBoard()elm:", elm );
-        var box_html  = "\
+        return "\
             <div class='box {{is_odd}}'>\
                  <form>\
                      <input type='hidden' name='id' value='{{id}}' /> \
@@ -121,8 +161,15 @@
                      <input type='hidden' name='quad-col' value={{quad_col}}' /> \
                      <input type='hidden' name='quad-id' value={{quad_id}}' /> \
                  </form>\
-                 <input type='text' name='edit-input' value='' maxlength='1' onkeypress='return event.charCode >= 48 && event.charCode <= 57' /> \
+                 <input type='text' name='edit-input' value='' maxlength='1' onkeypress='return event.charCode >= 49 && event.charCode <= 57' /> \
             </div>";
+    }
+
+
+    function renderGameBoard(elm)
+    {
+        console.log("renderGameBoard()elm:", elm );
+        var box_html  = boxHTML();
 
         var html = "";
         var row = 0;
@@ -132,6 +179,7 @@
         var quad_id = 0;
         var quad = 0;
         var offset = 0;
+
 
         for(var i=0; i<81; i++)
         {
@@ -147,11 +195,12 @@
                 offset = i%27;
 
                 quad_id = base_quad + quad;
+            
             if( quad_id == 0 || 
-                 quad_id == 2 || 
-                 quad_id == 4 || 
-                 quad_id == 6 || 
-                 quad_id == 8 )
+                quad_id == 2 || 
+                quad_id == 4 || 
+                quad_id == 6 || 
+                quad_id == 8 )
             {
                 tmpl = tmpl.split("{{is_odd}}").join("odd");
             }else{
@@ -174,30 +223,39 @@
             html += tmpl;
         }
         $(elm).empty();
+        $(elm).hide();
+
         $(elm).html(html);
-        $(elm).find(".box input[type='text']").click(clickHandler);
-        $(elm).find(".box input[type='text']").on("change", inputHandler );
-        //initUI(elm);
+        $(elm).find(".box input[type='text']").keyup( inputHandler );
+        $(elm).fadeIn();
+        
     }
 
     function inputHandler(e)
     {
-        e.preventDefault();
-        var elm      = $(e.target).closest(".box");
-        var id       = elm.find("input[name='id']").val();
-        var col_id   = elm.find("input[name='col_id']").val();
-        var row_id   = elm.find("input[name='row_id']").val();
-        var quad_col = elm.find("input[name='quad-col']").val();
-        var quad_id  = elm.find("input[name='quad-id']").val();
-        var val     = elm.find("input[name='edit-input']").val();
-            val = ( val == "" )? -1 : Number( val );
-        console.log("inputHandler():id:", id );
-        check( val, row_id, col_id, quad_id );
+            e.preventDefault();
+        var data = getEventData(e);
+            console.log("inputHandler():id:", data.id );
+            check( data, { onWin:function(e){
+                            console.log("win win");
+                         }, onRowWin:function(e){
+                            console.log("row win");
+                         }, onColWin:function(e){
+                            console.log("col win");
+                         }, onQuadWin:function(e){
+                            console.log("quad win");
+                         }
+            });
     }
 
     function clickHandler(e)
     {   
-        e.preventDefault();
+            e.preventDefault();
+        var data = getEventData(e);
+    }
+
+    function getEventData(e)
+    {
         var elm      = $(e.target).closest(".box");
         var id       = elm.find("input[name='id']").val();
         var col_id     = elm.find("input[name='col_id']").val();
@@ -206,80 +264,112 @@
         var quad_id  = elm.find("input[name='quad-id']").val();
         var val     = elm.find("input[name='edit-input']").val();
             val = ( val == "" )? -1 : Number( val );
-        //console.log("clickHandler():id:", id );
+        
+        return {
+                elm : elm,
+                id : id,
+                col_id : col_id,
+                row_id : row_id,
+                quad_col : quad_col,
+                quad_id : quad_id, 
+                val : val
+            }
     }
 
-    function check( val, row_id, col_id, quad_id )
+    function check( data , config )
     {
-        console.log( "move:", val, row_id, col_id, quad_id );
-        var isRowOk  = getRowById( row_id );
-        var isColOk  = getColById( col_id );
-        var isQuadOk;// = getQuadById( quad_id );
-        console.log( "isRowOk:", isRowOk, ", isColOk:", isColOk, ", isQuadOk:", isQuadOk );
-        return isRowOk && isColOk && isQuadOk;
+        console.log( "move:", data );
+        var results = {};
+            results.row  = testRow( data.row_id );
+            results.col  = testCol( data.col_id );
+            results.quad;// = testQuad( data.quad_id );
+/*        
+        if( row_state.status == "success" )
+        {
+            //
+        }
+
+        if( col_state.status == "success" )
+        {
+            //
+        }
+
+        if( quad_state.status == "success" )
+        {
+            //
+        }
+*/
+        console.log( "row:state:", results.row.status , ", col:state:", results.col.status );//,  ", results.quad:", results.quad.status );
+        return results;
     }
 
-
-    function getRowById( row_id)
+    function testRow( row_id )
     {
-        console.log("checkRow():row_id", row_id );
         var elms = $(".game-board .box input[name='row_id'][value='"+ row_id +"'] ");
-        var values = [];
-        //var hasDuplicate;
-        $.each( elms, function(index, elm){
-            
-            var box = $(elm).closest(".box");
-            var val = $(box).find("input[name='edit-input']").val();
-                
-                val = ( val == "" )? -1 : Number( val );
-//                console.log("val:", val);
-                values.push( val );
-                
-        });
-//        console.log( "values:", values );
-        return ( values.sort().join("") == "012345678" );
+        return testElms( "row", elms );
     }
 
-    function getColById( col_id)
+    function testCol( col_id )
     {
-        console.log("getColById():col_id", col_id );
         var elms = $(".game-board .box input[name='col_id'][value='"+ col_id +"'] ");
-        var values = [];
-        //var hasDuplicate;
-        $.each( elms, function(index, elm){
-            
-            var box = $(elm).closest(".box");
-            var val = $(box).find("input[name='edit-input']").val();
-                
-                val = ( val == "" )? -1 : Number( val );
-//                console.log("val:", val);
-                values.push( val );
-                
-        });
-        console.log( "values:", values );
-        return ( values.sort().join("") == "012345678" );
+        return testElms( "column", elms );
     }
 
-    function getQuadById( quad_id)
+    function testQuad( quad_id)
     {
-        console.log("getQuadBy():quad_id", quad_id );
         var elms = $(".game-board .box input[name='quad-id'][value='"+ quad_id +"'] ");
-        var values = [];
-        //var hasDuplicate;
-        $.each( elms, function(index, elm){
-            
-            var box = $(elm).closest(".box");
-            var val = $(box).find("input[name='edit-input']").val();
-                
-                val = ( val == "" )? -1 : Number( val );
-//                console.log("val:", val);
-                values.push( val );
-                
-        });
-//        console.log( "values:", values );
-        return ( values.sort().join("") == "012345678" );
+        return testElms( "quadrant", elms );
     }
 
+
+    function elm2hash(elms)
+    {
+        var hash = {};
+        $.each( elms, function(index, elm){
+            var box = $(elm).closest(".box");
+            var val = $(box).find("input[name='edit-input']").val();
+                val = ( val == "" )? -1 : Number( val );
+                hash[val] = hash[val] ? hash[val] : [];
+                hash[val].push(index);
+                
+        });
+        return hash;
+    }
+
+    function testElms( type, elms )
+    {
+        var hash =  elm2hash(elms);
+        var results = {};
+
+        if( hash["-1"] ){
+            results.status = "error";
+            results.description = "error: all " + type + " squares are not filled in";
+        }
+        
+        if( !hash["-1"] && hash[1] && hash[2] && hash[3] && hash[4] && hash[5] && hash[6] && hash[7] && hash[8] && hash[9] )
+        {
+            results.status = "error";
+            results.description = "error: " + type + " has duplicate values";
+        }
+
+        if( !hash["-1"] && 
+             hash[1] && 
+             hash[2] && 
+             hash[3] && 
+             hash[4] && 
+             hash[5] && 
+             hash[6] && 
+             hash[7] && 
+             hash[8] && 
+             hash[9] ){
+            results.status = "success";
+            results.description = "success: winner winner, chicken dinner! "+ type + " has all numbers 1-9."; 
+        }
+
+        return results;
+    }
+
+    
 </script>
 
 
