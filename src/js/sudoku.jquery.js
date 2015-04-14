@@ -60,7 +60,7 @@
 	    {
 	        _remainging = {};
 	        _seeds = {};
-	        _history = {};
+	        _history = [];
 	        _count = 0;
 	        _config = {};
 	        _level = DEFAULT_LEVEL;
@@ -222,6 +222,7 @@
 					{
 						_remainging[data.id] = data;
 						_isPuzzelSolved = setRemainingValue( elm );
+						console.log("");
 						if( _isPuzzelSolved ){
 							console.log( "Puzzel Solved" );
 						}else{
