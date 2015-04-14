@@ -24,8 +24,8 @@
 
 <div class="content">
 
-    <div class="game-board"></div>
-
+    <div id="game-0" class="game-board"></div>
+    
     <p>
         <h1>Sudoku</h1>
         <div>The Classic Sudoku is a number placing puzzle based on a 9x9 grid with several given numbers. The object is to place the numbers 1 to 9 in the empty squares so that each row, each column and each 3x3 box contains the same number only once.
@@ -46,8 +46,19 @@
 <script type="text/javascript">
 
     $(document).ready(function(e){
-        //init(".game-board");
-        $(".game-board").sudoku({ level : "medium" });
+        
+        $(".game-board").sudoku({ level : "medium", 
+                                             onError:function(){
+                                                console.log("debug:onError()");
+                                             },
+                                             onMove: function(){
+                                                console.log("debug:onMove()");
+                                             },
+                                             onGameOver: function(){
+                                                console.log("debug:onGameOver()");
+                                             }
+                                          });
+            
     });
     
 </script>

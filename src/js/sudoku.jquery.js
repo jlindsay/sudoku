@@ -6,9 +6,14 @@
 			return;			
 		} 
 
-		return $(this).each(function() {
-				_instances.push( new SudokuGame().init( this, $config ) );
-				$.data(this, "sudoku");
+		return $(this).each( function() {
+				var instance = new SudokuGame();
+					instance.init( this, $config )
+					console.log("instance:", instance);
+					_instances.push( instance );
+					//console.log( $.data( this, "sudoku" , instance ) );
+					this.xxx = "asdf";
+					return $.data( this, "sudoku" , instance );
 		});
 	}
 
@@ -23,17 +28,26 @@
 	     * 3. Number can appear only once in each region.
 	     */
 
-	    var _self 		= this;
-	    
-	    var _config 	= {};
-	    var _level 		= "easy";
-	    var _history 	= [];
-	    var _seeds 		= {};
-		var _root;
+	    var _self 			= this;
+	    var MAX_ATTEMPTS 	= 300;
+
+	    var _config 		= {};
+	    var DEFAULT_LEVEL	= "easy";
+	    var _level 			= DEFAULT_LEVEL;
+	    var _root;
+		
+	    var _history 		= [];
+	    var _seeds 			= {};
+		var _remainging   	= {};
+		var _count 			= 0;
+		
+		var _isPuzzelSolved = false;
 
 	    function init( elm, config )
 	    {
 	        console.log("init():", elm );
+	        clean();
+
 	        _root = elm;
 	        _config = config || {};
 	        _level = config.level || _level;
@@ -42,9 +56,31 @@
 	        initGame();
 	    }
 
+	    function clean()
+	    {
+	        _remainging = {};
+	        _seeds = {};
+	        _history = {};
+	        _count = 0;
+	        _config = {};
+	        _level = DEFAULT_LEVEL;
+	        _isPuzzelSolved = false;
+	        try{
+	        	removeErrors();	
+	        	$(_root).empty();
+	        }catch(e)
+	        {}
+	        
+	    }
+
 	    function initUI()
 	    {
 	        var html = gameBoardHTML();
+	        	html += "<div class'actions'>\
+        					<button type='button' class='btn btn-action check'>check</button>\
+        					<button type='button' class='btn btn-action solve'>solve</button>\
+        					<button type='button' class='btn btn-action startOver'>start over</button>\
+    					</div>";
 
 	            $(_root).empty();
 	            $(_root).hide();
@@ -86,36 +122,144 @@
 	        	}
 	        });
 
+
+	        $('.game-board .solve').click(solve);
+	        $('.game-board .check').click(check);
+
 	    }
 
 	    function setSeedValue( elm )
 	    {
 	    	var r_val = random_range( 1, 9 );
     		$(elm).val( r_val );
-    		if( !testSeedInput( elm ) ){
-//    			console.log("warning:oops:r_val:already exists:", r_val , ", trying again.");
+    		if( !testInput( elm ) ){
     			return setSeedValue( elm );
     		}
     		return true;
 	    }
 
-	    function testSeedInput(elm)
+	    function testInput(elm)
 	    {
 	    	var data = input2data( { target: elm } );
 	       	var results = runTests( data );
-//	        	console.log("testSeedInput:col:", results.col.status, "row:", results.row.status, ", quad:", results.quad.status );
 	        if( results.col.status == "error" || results.row.status == "error" || results.quad.status == "error" ){
 	        	return false;
 	        }
-
 	        return true;
+	    }
+		
+		function check()
+	    {
+	    	console.log("check()");
+	    	$.each(_history, function(index, move){
+	    		var elm;
+	    		if(move.row.status == "error"){
+	    			highlightErrors(move, "row");
+	    		}
+	    		
+	    		if( move.col.status == "error"){	    			
+					highlightErrors(move, "col");
+	    		}
+				
+				if(move.quad.status == "error")
+	    		{
+	    			highlightErrors(move, "quad");	
+	    		}
+
+	    		setTimeout( function(){
+	    			removeErrors();
+	    		}, 3000 );
+
+	    	});
+	    }
+
+	    function highlightErrors( move , type )
+	    {
+	    	var id = null;
+	    		id = (type == "quad")? move.data.quad_id : id;
+	    		id = (type == "row")? move.data.row_id : id;
+	    		id = (type == "col")? move.data.col_id : id;
+	    		
+	    		elm = $(".game-board .box input[name='"+type+"_id'][value='"+ id +"'] ").closest(".box");
+				$(elm).addClass("error-quad");
+			
+				elm = $(".game-board .box input[name='id'][value='"+ move.data.id +"'] ").closest(".box");
+				elm.addClass("error");	
+				elm.css("background-color", "#ff0000");	
+
+			var _duplicates = move[type].hash[move.data.val];
+
+			$.each( _duplicates, function(index, item){
+				elm = $(".game-board .box input[name='id'][value='"+ item.data.id +"'] ").closest(".box");	    			
+				elm.addClass("error-duplicate");	
+				elm.css("background-color", "#ff0000");
+				elm.find("input[name='edit_input']").css("color", "#fff");	
+			});
+
+				
+	    }
+
+	    function removeErrors()
+	    {	
+	    	$(_root).find(".box").removeClass("error");
+			$(_root).find(".box").removeClass("error-col");
+			$(_root).find(".box").removeClass("error-row");
+			$(_root).find(".box").removeClass("error-quad");
+			$(_root).find(".box").css("background-color", "");	
+			$(_root).find(".box input[name='edit_input']").css("color", "");
+	    }
+
+		
+	    
+	    function solve()
+	    {
+			console.log("solve()");
+			_count = 0;
+			_remainging = {};
+			$( _root ).find(".box input[name='edit_input']").each( function( key, elm ){
+				var data = input2data({ target : elm });
+					if( data.val == Number( -1 ) )
+					{
+						_remainging[data.id] = data;
+						_isPuzzelSolved = setRemainingValue( elm );
+						if( _isPuzzelSolved ){
+							console.log( "Puzzel Solved" );
+						}else{
+							console.log( "Well damn, we can't solve this puzzel..." );
+						}
+					}
+			});
+	    }
+
+	    function setRemainingValue( elm )
+	    {
+			console.log("setRemainingValue()");
+	    	_count++;
+	    	if( _count > MAX_ATTEMPTS )
+	    	{
+	    		return { error: "can't solve the puzzel, exceeded MAX_ATTEMPTS:", MAX_ATTEMPTS }
+	    	}
+	    	var r_val = random_range( 1 , 9 );
+    		$(elm).val( r_val );
+    		
+    		if( !testInput( elm ) ){
+    			return setRemainingValue( elm );
+    		}
+    		return true;
+	    }
+	    
+	    function startOver()
+	    {
+	    	console.log("startOver()");
 	    }
 
 	    function inputHandler(e)
 	    {
 	            e.preventDefault();
+			
+				removeErrors();
 
-	        var results = runTests( input2data(e) );
+	        var results = runTests( input2data( e ) );
 
 			if( results.col.status == "error" ){
 				console.log("err... huston... col has a duplicate...");
@@ -161,6 +305,7 @@
 	    function runTests( data , config )
 	    {
 	        var results = {};
+	        	results.data = data;
 	            results.row  = testRow( data.row_id );
 	            results.col  = testCol( data.col_id );
 	            results.quad = testQuad( data.quad_id );
@@ -221,10 +366,14 @@
 	        var hash = {};
 	        $.each( elms, function(index, elm){
 	            var box = $(elm).closest(".box");
-	            var val = $(box).find("input[name='edit_input']").val();
+	            var input_elm = $(box).find("input[name='edit_input']");
+	            var val = $(input_elm).val();
 	                val = ( val == "" )? -1 : Number( val );
 	                hash[val] = hash[val] ? hash[val] : [];
-	                hash[val].push( index );
+				
+				var data = input2data( { target: input_elm } );
+	                hash[val].push( { index:index, 
+									  data : data } );
 	                
 	        });
 	        return hash;
@@ -290,9 +439,6 @@
 	            col++;
 	            html += tmpl;
 	        }
-
-	        
-
 	        return html;
 	    }
 
@@ -328,11 +474,32 @@
 	    	return Math.floor(Math.random() * (max - min)) + min;
 	    }
 	    
+
+	    
+	    function level()
+	    {
+	    	return _level;
+	    }
+	    function history()
+	    {
+	    	return _history;
+	    }
+	    function seeds()
+	    {
+	    	return _seeds;
+	    }
+
 		/**
 		 * public method(s);
 		 */
 	    return {
 	    	init : init,
+	    	check : check,
+	    	solve : solve,
+	    	startOver : startOver,
+	    	history : history, 
+	    	seeds: seeds, 
+	    	level:level
 	    }
 
 	}
