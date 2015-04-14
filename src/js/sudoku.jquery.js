@@ -8,7 +8,7 @@
 
 		return $(this).each( function() {
 				var instance = new SudokuGame();
-					instance.init( this, $config )
+					instance.init( this, $config );
 					console.log("instance:", instance);
 					_instances.push( instance );
 					//console.log( $.data( this, "sudoku" , instance ) );
@@ -79,7 +79,7 @@
 	        	html += "<div class'actions'>\
         					<button type='button' class='btn btn-action check'>check</button>\
         					<button type='button' class='btn btn-action solve'>solve</button>\
-        					<button type='button' class='btn btn-action startOver'>start over</button>\
+        					<button type='button' class='btn btn-action startover'>start over</button>\
     					</div>";
 
 	            $(_root).empty();
@@ -122,9 +122,9 @@
 	        	}
 	        });
 
-
 	        $('.game-board .solve').click(solve);
 	        $('.game-board .check').click(check);
+			$('.game-board .startover').click(startOver);
 
 	    }
 
@@ -252,6 +252,7 @@
 	    function startOver()
 	    {
 	    	console.log("startOver()");
+			init( _root, _config );
 	    }
 
 	    function inputHandler(e)
