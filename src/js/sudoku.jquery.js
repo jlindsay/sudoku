@@ -1,6 +1,5 @@
 (function( $ ){
 
-	//NOTE: inorder to get around have many instances, and several types of classes, I'm wraping each class in their own constructor, and creating instances for each child selected
 	$.fn.sudoku = function($config)
 	{
 		if( $.data( this, "sudoku" ) ){
@@ -8,10 +7,8 @@
 		} 
 
 		return $(this).each(function() {
-//				console.log( "sudoku:", $config.sudoku );
-		        _instances.push( new SudokuGame().init( this, $config ) );
-//		        console.log("_instances:", _instances.length);
-		        $.data(this, "sudoku");
+				_instances.push( new SudokuGame().init( this, $config ) );
+				$.data(this, "sudoku");
 		});
 	}
 
@@ -21,21 +18,25 @@
 	{
 		/**
 	     * Rules
-	     * 1. Number can appear only once on each row.
-	     * 2. Number can appear only once on each column.
-	     * 3. Number can appear only once on each region.
+	     * 1. Number can appear only once in each row.
+	     * 2. Number can appear only once in each column.
+	     * 3. Number can appear only once in each region.
 	     */
-	//     var _self = this;
-	     var _root;
-	     var _config = {};
 
-	    this.init = init;
+	    var _self 		= this;
+	    
+	    var _config 	= {};
+	    var _level 		= "easy";
+	    var _history 	= [];
+	    var _seeds 		= {};
+		var _root;
 
 	    function init( elm, config )
 	    {
 	        console.log("init():", elm );
 	        _root = elm;
-	        _config = config;
+	        _config = config || {};
+	        _level = config.level || _level;
 
 	        initUI();
 	        initGame();
@@ -52,27 +53,73 @@
 	            $(_root).fadeIn();
 	    }
 	    
+	    function initGame()
+	    {
+	        
+	        console.log("initGame()");
+	        _seeds = {};
+
+	        //default level
+	        for(var i=0; i<5; i++){
+	        	var r_elm = random_range(0,81);
+	        	_seeds[r_elm] = {};
+	        }
+	        
+	      	//lets fetch the random elements, and initilize them.
+	        $(_root).find(".box input[name='edit-input']").each( function( index, elm ){
+	        	var data = input2Data({ target : elm });
+	        	if( _seeds[data.id] )
+	        	{
+	        		_seeds[data.id] = data;
+	        		var r_val = random_range( 1, 9 );
+
+	        		$(data.input_elm).val( r_val );
+					$(data.input_elm).attr("readonly","true");
+					$(data.input_elm).off('keyup');
+
+					testSeedInput( data.input_elm );
+	        	}
+	        });
+
+	    }
+
+	    function testSeedInput(elm)
+	    {
+	    	var data = input2Data( { target: elm } );
+	        //	console.log("data:", data );
+	       	var results = check( data );
+	        	console.log("testSeedInput:results:", results );
+	        	
+	        	//console.log( "row.status:", results.row.status , "col.status:", results.col.status, "quad.status:");//, results.quad.status );
+
+	        	//return results;
+	    }
+
 	    function inputHandler(e)
 	    {
 	            e.preventDefault();
-	        var data = getEventData(e);
-	//            console.log("inputHandler():id:", data.id );
-	            check( data );
+	        var data = input2Data(e);
+	        var results = check( data );
+
+	        	_history.push( data );
 	    }
 
-	    function getEventData(e)
+	    function input2Data(e)
 	    {
-	        var elm      = $(e.target).closest(".box");
-	        var id       = elm.find("input[name='id']").val();
-	        var col_id     = elm.find("input[name='col_id']").val();
-	        var row_id     = elm.find("input[name='row_id']").val();
-	        var quad_col = elm.find("input[name='quad-col']").val();
-	        var quad_id  = elm.find("input[name='quad-id']").val();
-	        var val     = elm.find("input[name='edit-input']").val();
+	        var box_elm    = $(e.target).closest(".box");
+	        var id         = box_elm.find("input[name='id']").val();
+	        var col_id     = box_elm.find("input[name='col_id']").val();
+	        var row_id     = box_elm.find("input[name='row_id']").val();
+	        var quad_col   = box_elm.find("input[name='quad-col']").val();
+	        var quad_id    = box_elm.find("input[name='quad-id']").val();
+	        var input_elm  = box_elm.find("input[name='edit-input']");
+	        var val        = input_elm.val();
+
 	            val = ( val == "" )? -1 : Number( val );
 	        
 	        return {
-	                elm : elm,
+	                box_elm : box_elm,
+	                input_elm: input_elm,
 	                id : id,
 	                col_id : col_id,
 	                row_id : row_id,
@@ -84,13 +131,13 @@
 
 	    function check( data , config )
 	    {
-	            console.log( "move:", data );
+//	            console.log( "check:", data );
 	        var results = {};
 	            results.row  = testRow( data.row_id );
 	            results.col  = testCol( data.col_id );
 	            results.quad;// = testQuad( data.quad_id );
 
-	            console.log( "row:state:", results.row.status , ", col:state:", results.col.status );//,  ", results.quad:", results.quad.status );
+//	            console.log( "row:state:", results.row.status , ", col:state:", results.col.status );//,  ", results.quad:", results.quad.status );
 	        return results;
 	    }
 
@@ -113,7 +160,7 @@
 	    }
 
 
-	    function boxes2hash(elms)
+	    function html2hash(elms)
 	    {
 	        var hash = {};
 	        $.each( elms, function(index, elm){
@@ -124,52 +171,53 @@
 	                hash[val].push(index);
 	                
 	        });
+//	        console.log("html2hash:hash:", hash );
 	        return hash;
 	    }
 
 	    function testElms( type, elms )
 	    {
-	        var hash =  boxes2hash(elms);
-	        var results = {};
+	        var hash =  html2hash(elms);
+	        var results = { type: type, hash:hash };
+	        	
+//	        console.log("hash:", hash );
+/*
+	        if( !hash["-1"] && 
+	             hash[1] && hash[2] && hash[3] && hash[4] && 
+	             hash[5] && hash[6] && hash[7] && hash[8] && 
+	             hash[9] ){
+	            //results.status = "success";
+	        	//results.error = null;
+	            //results.description = "success: winner winner, chicken dinner! "+ type + " has all numbers 1-9."; 
+	        }
+*/
 
 	        if( hash["-1"] ){
-	            results.status = "error";
-	            results.description = "error: all " + type + " squares are not filled in";
-	        }
-	        
-	        if( !hash["-1"] && hash[1] && hash[2] && hash[3] && hash[4] && hash[5] && hash[6] && hash[7] && hash[8] && hash[9] )
-	        {
-	            results.status = "error";
-	            results.description = "error: " + type + " has duplicate values";
+	            //results[type].status = "error";
+/*	            
+	            results.errors.push( { code:2, 
+	            					   description : "error: all " + type + " squares are not filled in" });
+*/
 	        }
 
+	        
 	        if( !hash["-1"] && 
-	             hash[1] && 
-	             hash[2] && 
-	             hash[3] && 
-	             hash[4] && 
-	             hash[5] && 
-	             hash[6] && 
-	             hash[7] && 
-	             hash[8] && 
-	             hash[9] ){
-	            results.status = "success";
-	            results.description = "success: winner winner, chicken dinner! "+ type + " has all numbers 1-9."; 
-	        }
+	        	 hash[1] || hash[2] || hash[3] || hash[4] || 
+	        	 hash[5] || hash[6] || hash[7] || hash[8] || 
+	        	 hash[9] )
+	        {
+	            //results[type].status = "error";
+/*
+	            results.errors.push( { code:1, 
+	            					   description : "error: " + type + " has duplicate values" } );
+*/	        }
 
 	        return results;
 	    }
 
-	    function solve()
-	    {
-	        //
-	    }
-
-	    function initGame()
-	    {
-	        //Math.random() * 81;
-	    }
-
+	    /**
+	     * util(s)
+	     */
 	    function gameBoardHTML()
 	    {
 	//        console.log("gameBoardHTML()");
@@ -184,7 +232,7 @@
 	        var quad = 0;
 	        var offset = 0;
 
-	        for( var i=0; i<81; i++ )
+	        for(var i=0; i<81; i++ )
 	        {
 	            var tmpl = box_html;
 
@@ -227,7 +275,6 @@
 	        }
 
 	        return html;
-
 	    }
 
 	    function boxHTML()
@@ -244,6 +291,21 @@
 	                 <input type='text' name='edit-input' value='' maxlength='1' onkeypress='return event.charCode >= 49 && event.charCode <= 57' /> \
 	            </div>";
 	    }
+
+	    function random_range( min, max )
+	    {
+	    	return Math.floor(Math.random() * (max - min)) + min;
+	    }
+
+	    
+		/**
+		 * public method(s);
+		 */
+	    return {
+	    	
+	    	init : init,
+	    }
+
 	}
 
 })( jQuery );
