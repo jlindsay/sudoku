@@ -12,8 +12,14 @@ Sodoku
 
 	npm install
 	bower install
-	grunt
+	grunt dev
 >	open in your browser at http://localhost:3030/
+
+### Grunt tasks
+	grunt
+	grunt dev 
+	grunt archive 
+
 
 ### Development Dependences
 Grunt, Grunt-clint, npm, bower, node, git & homebrew if your OSX
