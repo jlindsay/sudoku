@@ -21,52 +21,59 @@
 </head>
 <body>
 
+    <article class="post">
+        <section class="section intro-section no-pad-top">
+            <div class="section-content">
+                <div class="section-copy">
+                    <div class="pannel">
+                        <div id="game-0" class="game-board"></div>
+                        <div id="game-1" class="game-board"></div>
+                        <div id="game-2" class="game-board"></div>
+                    </div>
+                </div>
 
-<div class="content">
+                <div class="section-copy">
+                    <h1>Sudoku</h1>
+                        <p>The Classic Sudoku is a number placing puzzle based on a 9x9 grid with several given numbers. The object is to place the numbers 1 to 9 in the empty squares so that each row, each column and each 3x3 box contains the same number only once.
+                        </p>
+                </div>
+                <div class="section-copy">
+                    <h1>Rules</h1>
+                    <div>1. Number can appear only once in each row.</div>
+                    <div>2. Number can appear only once in each column.</div>
+                    <div>3. Number can appear only once in each quadrant.</div>
+                </div>
+            
 
-    <div id="game-0" class="game-board"></div>
-    <div id="game-1" class="game-board"></div>
-    <div id="game-2" class="game-board"></div>
-    
-    
-    <p>
-        <h1>Sudoku</h1>
-        <div>The Classic Sudoku is a number placing puzzle based on a 9x9 grid with several given numbers. The object is to place the numbers 1 to 9 in the empty squares so that each row, each column and each 3x3 box contains the same number only once.
-        </div>
-    </p>
+                <div class="section-copy">
+                    <h4>html</h4>
+                    <code class="prettyprint code">
+                        &lt;div class=&quot;game-board&quot;&gt;&lt;/div&gt;
+                    </code>
+                
+                    <h4>javascript</h4>
+                    <code class="prettyprint code">
+                        $(&quot;.game-board&quot;).sudoku({ level : &quot;medium&quot; });            
+                    </code>
 
-    <p>
-        <h1>Rules</h1>
-        <div>1. Number can appear only once in each row.</div>
-        <div>2. Number can appear only once in each column.</div>
-        <div>3. Number can appear only once in each quadrant.</div>
-    </p>
-    <div class="pannel">
-        <h3>html</h3>
-        <code class="prettyprint code">
-            &lt;div class=&quot;game-board&quot;&gt;&lt;/div&gt;
-        </code>
-    </div>
-    <div class="pannel">
-        <h3>javascript</h3>
-        <code class="prettyprint code">
-            &lt;div class=&quot;game-board&quot;&gt;&lt;/div&gt;
-        </code>
-    </div>
-</div>
+                    <h4>Dependencies</h4>
+                    <div>
+                        JQuery & sudoku.jquery.js
+                    </div>
+                </div>
+
+        </section>
+    </article>
+
 
 
 
 <script src="./bower/jquery/dist/jquery.min.js"></script>
 <script src="./js/sudoku.jquery.js"></script>
 <script type="text/javascript">
-
     $(document).ready(function(e){
-        
-        $(".game-board").sudoku({ level : "medium" });
-            
+        $(".game-board").sudoku({ level : "medium" });            
     });
-    
 </script>
 
 
