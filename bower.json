@@ -19,6 +19,7 @@
     "d3": "~3.5.5",
     "modernizer": "~2.8.2",
     "responsive": "~4.0.3",
-    "underscore": "~1.8.3"
+    "underscore": "~1.8.3",
+    "google-code-prettify": "~1.0.4"
   }
 }

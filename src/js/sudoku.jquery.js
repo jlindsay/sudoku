@@ -8,11 +8,9 @@
 
 		return $(this).each( function() {
 				var instance = new SudokuGame();
-					instance.init( this, $config );
-					console.log("instance:", instance);
 					_instances.push( instance );
-					//console.log( $.data( this, "sudoku" , instance ) );
-					this.xxx = "asdf";
+					$config.instance_id = _instances.length;
+					instance.init( this, $config );
 					return $.data( this, "sudoku" , instance );
 		});
 	}
@@ -27,50 +25,18 @@
 	     * 2. Number can appear only once in each column.
 	     * 3. Number can appear only once in each region.
 	     */
-
-	    var _self 			= this;
-	    var MAX_ATTEMPTS 	= 300;
-
-	    var _config 		= {};
-	    var DEFAULT_LEVEL	= "easy";
-	    var _level 			= DEFAULT_LEVEL;
-	    var _root;
-		
-	    var _history 		= [];
-	    var _seeds 			= {};
-		var _remainging   	= {};
-		var _count 			= 0;
-		
-		var _isPuzzelSolved = false;
-
 	    function init( elm, config )
 	    {
 	        console.log("init():", elm );
 	        clean();
 
-	        _root = elm;
-	        _config = config || {};
-	        _level = config.level || _level;
-
+	        _root 			= elm;
+	        _config 		= config || {};
+	        _level 			= config.level || _level;
+	        _instance_id 	= config.instance_id || _instance_id;
+	        
 	        initUI();
 	        initGame();
-	    }
-
-	    function clean()
-	    {
-	        _remainging = {};
-	        _seeds = {};
-	        _history = [];
-	        _count = 0;
-	        _config = {};
-	        _level = DEFAULT_LEVEL;
-	        _isPuzzelSolved = false;
-	        try{
-	        	removeErrors();	
-	        	$(_root).empty();
-	        }catch(e)
-	        {}
-	        
 	    }
 
 	    function initUI()
@@ -78,8 +44,9 @@
 	        var html = gameBoardHTML();
 	        	html += "<div class'actions'>\
         					<button type='button' class='btn btn-action check'>check</button>\
-        					<button type='button' class='btn btn-action solve'>solve</button>\
+        					<!--button type='button' class='btn btn-action solve'>solve</button-->\
         					<button type='button' class='btn btn-action startover'>start over</button>\
+        					<span class='game_title'>Game #"+_instance_id+"</span>\
     					</div>";
 
 	            $(_root).empty();
@@ -122,10 +89,26 @@
 	        	}
 	        });
 
-	        $('.game-board .solve').click(solve);
-	        $('.game-board .check').click(check);
-			$('.game-board .startover').click(startOver);
+	        $(_root).find('.solve').click(solve);
+	        $(_root).find('.check').click(check);
+			$(_root).find('.startover').click(startOver);
 
+	    }
+
+		function clean()
+	    {
+	        _remainging = {};
+	        _seeds = {};
+	        _history = [];
+	        _count = 0;
+	        _config = {};
+	        _level = DEFAULT_LEVEL;
+	        _isPuzzelSolved = false;
+
+	        try{
+	        	removeErrors();	
+	        	$(_root).empty();
+	        }catch(e){}
 	    }
 
 	    function setSeedValue( elm )
@@ -150,7 +133,7 @@
 		
 		function check()
 	    {
-	    	console.log("check()");
+//	    	console.log("check()");
 	    	$.each(_history, function(index, move){
 	    		var elm;
 	    		if(move.row.status == "error"){
@@ -176,21 +159,21 @@
 	    function highlightErrors( move , type )
 	    {
 	    	var id = null;
-	    		id = (type == "quad")? move.data.quad_id : id;
-	    		id = (type == "row")? move.data.row_id : id;
-	    		id = (type == "col")? move.data.col_id : id;
+	    		id = ( type == "quad" )? move.data.quad_id : id;
+	    		id = ( type == "row" )? move.data.row_id : id;
+	    		id = ( type == "col" )? move.data.col_id : id;
 	    		
-	    		elm = $(".game-board .box input[name='"+type+"_id'][value='"+ id +"'] ").closest(".box");
+	    		elm = $(_root).find(".box input[name='"+type+"_id'][value='"+ id +"'] ").closest(".box");
 				$(elm).addClass("error-quad");
 			
-				elm = $(".game-board .box input[name='id'][value='"+ move.data.id +"'] ").closest(".box");
+				elm = $(_root).find(".box input[name='id'][value='"+ move.data.id +"'] ").closest(".box");
 				elm.addClass("error");	
 				elm.css("background-color", "#ff0000");	
 
 			var _duplicates = move[type].hash[move.data.val];
 
 			$.each( _duplicates, function(index, item){
-				elm = $(".game-board .box input[name='id'][value='"+ item.data.id +"'] ").closest(".box");	    			
+				elm = $(_root).find(".box input[name='id'][value='"+ item.data.id +"'] ").closest(".box");	    			
 				elm.addClass("error-duplicate");	
 				elm.css("background-color", "#ff0000");
 				elm.find("input[name='edit_input']").css("color", "#fff");	
@@ -225,8 +208,10 @@
 						console.log("");
 						if( _isPuzzelSolved ){
 							console.log( "Puzzel Solved" );
+							//alert("Puzzel Solved");
 						}else{
 							console.log( "Well damn, we can't solve this puzzel..." );
+							//alert("Well damn, we can't solve this puzzel...");
 						}
 					}
 			});
@@ -345,17 +330,17 @@
 	     */
 	    function testRow( row_id )
 	    {
-	        return test( "row", $(".game-board .box input[name='row_id'][value='"+ row_id +"'] ") );
+	        return test( "row", $(_root).find(".box input[name='row_id'][value='"+ row_id +"'] ") );
 	    }
 
 	    function testCol( col_id )
 	    {
-	        return test( "column", $(".game-board .box input[name='col_id'][value='"+ col_id +"'] ") );
+	        return test( "column", $(_root).find(".box input[name='col_id'][value='"+ col_id +"'] ") );
 	    }
 
 	    function testQuad( quad_id)
 	    {
-	        return test( "quadrant", $(".game-board .box input[name='quad_id'][value='"+ quad_id +"'] ") );
+	        return test( "quadrant", $(_root).find(".box input[name='quad_id'][value='"+ quad_id +"'] ") );
 	    }
 
 	    
@@ -470,14 +455,11 @@
 	    	";
 	    }
 
-
 	    function random_range( min, max )
 	    {
 	    	return Math.floor(Math.random() * (max - min)) + min;
 	    }
-	    
 
-	    
 	    function level()
 	    {
 	    	return _level;
@@ -490,6 +472,25 @@
 	    {
 	    	return _seeds;
 	    }
+
+	    /**
+		 * private variables(s);
+		 */
+	    var _self 			= this;
+	    var MAX_ATTEMPTS 	= 300;
+
+	    var _config 		= {};
+	    var DEFAULT_LEVEL	= "easy";
+	    var _level 			= DEFAULT_LEVEL;
+	    var _root;
+		
+	    var _history 		= [];
+	    var _seeds 			= {};
+		var _remainging   	= {};
+		var _count 			= 0;
+		
+		var _isPuzzelSolved = false;
+		var _instance_id  	= 0;
 
 		/**
 		 * public method(s);
