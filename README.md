@@ -28,3 +28,8 @@ Grunt, Grunt-clint, npm, bower, node, git & homebrew if your OSX
 	npm install bower -g
 	npm install grunt -g
 	npm install grunt-cli -g
+
+
+##DEMO 
+> http://media.crazyreds.com/zips/sudoko/
+> https://vimeo.com/125010747 
