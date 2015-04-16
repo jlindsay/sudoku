@@ -27,7 +27,7 @@
 	     */
 	    function init( elm, config )
 	    {
-	        console.log("init():", elm );
+//	        console.log("init():", elm );
 	        clean();
 
 	        _root 			= elm;
@@ -59,7 +59,7 @@
 	    function initGame()
 	    {
 	        
-	        console.log("initGame()");
+//	        console.log("initGame()");
 	        _seeds = {};
 
 	        var total_numbs = 0;
@@ -69,7 +69,7 @@
 	        	total_numbs = (_level == "medium-ish" )? 15 : total_numbs;
 	        	total_numbs = (_level == "hard-ish" )? 10 : total_numbs;
 	        	total_numbs = (_level == "hard" )? 5 : total_numbs;
-	        	console.log("total_numbs:", total_numbs);
+//	        	console.log("total_numbs:", total_numbs);
 	        
 	        //default level
 	        for(var i=0; i<total_numbs; i++){
@@ -196,7 +196,7 @@
 	    
 	    function solve()
 	    {
-			console.log("solve()");
+//			console.log("solve()");
 			_count = 0;
 			_remainging = {};
 			$( _root ).find(".box input[name='edit_input']").each( function( key, elm ){
@@ -205,12 +205,12 @@
 					{
 						_remainging[data.id] = data;
 						_isPuzzelSolved = setRemainingValue( elm );
-						console.log("");
+//						console.log("");
 						if( _isPuzzelSolved ){
-							console.log( "Puzzel Solved" );
+//							console.log( "Puzzel Solved" );
 							//alert("Puzzel Solved");
 						}else{
-							console.log( "Well damn, we can't solve this puzzel..." );
+//							console.log( "Well damn, we can't solve this puzzel..." );
 							//alert("Well damn, we can't solve this puzzel...");
 						}
 					}
@@ -219,12 +219,13 @@
 
 	    function setRemainingValue( elm )
 	    {
-			console.log("setRemainingValue()");
+//			console.log("setRemainingValue()");
 	    	_count++;
 	    	if( _count > MAX_ATTEMPTS )
 	    	{
-	    		return { error: "can't solve the puzzel, exceeded MAX_ATTEMPTS:", MAX_ATTEMPTS }
+	    		return { "error": "can't solve the puzzel, exceeded MAX_ATTEMPTS:"+ MAX_ATTEMPTS };
 	    	}
+
 	    	var r_val = random_range( 1 , 9 );
     		$(elm).val( r_val );
     		
@@ -236,7 +237,7 @@
 	    
 	    function startOver()
 	    {
-	    	console.log("startOver()");
+//	    	console.log("startOver()");
 			init( _root, _config );
 	    }
 
@@ -249,16 +250,16 @@
 	        var results = runTests( input2data( e ) );
 
 			if( results.col.status == "error" ){
-				console.log("err... huston... col has a duplicate...");
+//				console.log("err... huston... col has a duplicate...");
 			}
 			if( results.row.status == "error" ){
-				console.log("err... huston... row has a duplicate...");
+//				console.log("err... huston... row has a duplicate...");
 			}
 			if( results.quad.status == "error" ){
-	        	console.log("err... huston... quad has a duplicate...");
+//	        	console.log("err... huston... quad has a duplicate...");
 	        }
 	        if( results.col.status == "ok" && results.row.status == "ok" && results.quad.status == "ok" ){
-	        	console.log("ok, were all cool, yo... ");
+//	        	console.log("ok, were all cool, yo... ");
 	        }
 
 	        _history.push( results );
