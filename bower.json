@@ -15,7 +15,6 @@
   ],
   "dependencies": {
     "jquery": "~2.1.3",
-    "require": "*",
     "d3": "~3.5.5",
     "modernizer": "~2.8.2",
     "responsive": "~4.0.3",
