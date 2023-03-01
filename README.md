@@ -31,4 +31,4 @@ Grunt, Grunt-clint, npm, bower, node, git & homebrew if your OSX
 
 
 ##DEMO 
-> http://media.crazyreds.com/demo/sudoku/
+> http://media.lindsayfilm.com/demo/sudoku/
